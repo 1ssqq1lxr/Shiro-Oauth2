@@ -1,0 +1,71 @@
+/*
+ * Copyright (c) 2013 Andaily Information Technology Co. Ltd
+ * www.andaily.com
+ * All rights reserved.
+ *
+ * This software is the confidential and proprietary information of
+ * Andaily Information Technology Co. Ltd ("Confidential Information").
+ * You shall not disclose such Confidential Information and shall use
+ * it only in accordance with the terms of the license agreement you
+ * entered into with Andaily Information Technology Co. Ltd.
+ */
+package com.it.uaa.oauth.validator.token;
+
+import com.it.uaa.common.Oauth2RequestHolder;
+import com.it.uaa.domain.Oauth2AccessToken;
+import com.it.uaa.domain.Oauth2ClientDetails;
+import com.it.uaa.oauth.validator.AbstractOauthTokenValidator;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.oltu.oauth2.common.error.OAuthError;
+import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
+import org.apache.oltu.oauth2.common.message.OAuthResponse;
+
+import javax.servlet.http.HttpServletResponse;
+import java.util.Optional;
+
+/**
+ * @Auther: lxr
+ * @Date: 2018/9/29 13:47
+ * @Description:  refresh token 校验器
+ */
+@Slf4j
+public class RefreshTokenClientDetailsValidator extends AbstractOauthTokenValidator {
+
+
+
+    /*
+    * /com.it.uaa.oauth/token?client_id=mobile-client&client_secret=mobile&grant_type=refresh_token&refresh_token=b36f4978-a172-4aa8-af89-60f58abe3ba1
+    * */
+    @Override
+    protected OAuthResponse validateSelf(Oauth2ClientDetails clientDetails) throws OAuthSystemException {
+        String clientId = clientDetails.getClientId();
+        //validate grant_type
+        final String grantType = grantType();
+        if (!clientDetails.getGrantTypes().contains(grantType)) {
+            log.debug("Invalid grant_type '{}', client_id = '{}'", grantType, clientId);
+            return invalidGrantTypeResponse(grantType);
+        }
+        //validate client_secret
+        final String clientSecret =  Oauth2RequestHolder.getOauthRequest().getClientSecret();
+        if (clientSecret == null || !clientSecret.equals(clientDetails.getClientSecret())) {
+            log.debug("Invalid client_secret '{}', client_id = '{}'", clientSecret,clientId);
+            return invalidClientSecretResponse();
+        }
+        //validate refresh_token
+        final String refreshToken =  Oauth2RequestHolder.getOauthRequest().getRefreshToken();
+        Optional<Oauth2AccessToken> oauth2AccessToken = oauthService.loadAccessTokenByRefreshToken(refreshToken, clientId);
+        if(!oauth2AccessToken.isPresent() ||  oauth2AccessToken.get().tokenExpired()){
+            return invalidRefreshTokenResponse(refreshToken);
+        }
+        return null;
+    }
+
+    private OAuthResponse invalidRefreshTokenResponse(String refreshToken) throws OAuthSystemException {
+        return OAuthResponse.errorResponse(HttpServletResponse.SC_BAD_REQUEST)
+                .setError(OAuthError.TokenResponse.INVALID_GRANT)
+                .setErrorDescription("Invalid refresh_token: " + refreshToken)
+                .buildJSONMessage();
+    }
+
+
+}

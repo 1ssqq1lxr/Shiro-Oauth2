@@ -1,0 +1,55 @@
+spring:
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    url: jdbc:mysql://192.168.30.58:3306/uaa?useUnicode=true&characterEncoding=utf8&useSSL=false
+    username: imiland
+    password: ilandll1!
+    hikari:
+      auto-commit: false
+      data-source-properties:
+        cachePrepStmts: true
+        prepStmtCacheSize: 250
+        prepStmtCacheSqlLimit: 2048
+        useServerPrepStmts: true
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+    database: MYSQL
+    show-sql: true
+    properties:
+      hibernate.id.new_generator_mappings: true
+      hibernate.connection.provider_disables_autocommit: true
+      hibernate.cache.use_second_level_cache: false
+      hibernate.cache.use_query_cache: false
+      hibernate.generate_statistics: true
+    generate-ddl: true
+  redis:
+    host: 192.168.30.58
+    password: hjimi123
+    database: 1
+    port: 6379
+#  freemarker:
+#    allow-request-override: false
+#    allow-session-override: false
+#    cache: false
+#    charset: UTF-8
+#    check-template-location: true
+#    content-type: text/html
+#    enabled: true
+#    expose-request-attributes: false
+#    expose-session-attributes: false
+#    expose-spring-macro-helpers: true
+#    prefer-file-system-access: true
+#    suffix: .ftl
+#    template-loader-path: classpath:/templates/
+#    settings:
+#      template_update_delay: 0
+#      default_encoding: UTF-8
+#      classic_compatible: true
+#      date_format: yyyy-MM-dd
+#      time_format: HH:mm:ss
+#      datetime_format: yyyy-MM-dd HH:mm:ss
+#    request-context-attribute: rc
+#logging:
+server:
+  port: 8889
+#  config: classpath:logback-boot.xml
