@@ -26,7 +26,7 @@
   <url>http://www.example.com</url>
 
   <properties>
-    <shiro.version>1.2.3</shiro.version>
+    <shiro.version>1.6.0</shiro.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
